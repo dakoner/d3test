@@ -70,6 +70,7 @@ d3.csv("readme-flights.csv", function(error, data) {
   x.domain([new Date(1999, 0, 1), new Date(2003, 0, 0)]);
   y.domain([0, d3.max(data, function(d) { return d.value; })]);
   zoom.x(x);
+  zoom.y(y);
 
   svg.select("path.line").data([data]);
   draw();
