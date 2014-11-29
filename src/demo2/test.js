@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 60, bottom: 30, left: 20},
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
@@ -34,6 +34,17 @@ var svg = d3.select("body").append("svg")
 var zoom = d3.behavior.zoom()
     .on("zoom", draw);
 
+
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")");
+
+
+svg.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + width + ",0)");
+
 svg.append("clipPath")
     .attr("id", "clip")
   .append("rect")
@@ -41,15 +52,6 @@ svg.append("clipPath")
     .attr("y", y(1))
     .attr("width", x(1) - x(0))
     .attr("height", y(0) - y(1));
-
-svg.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)");
-
-
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")");
 
 svg.append("path")
     .attr("class", "line")
@@ -64,11 +66,11 @@ svg.append("rect")
 d3.csv("readme-flights.csv", function(error, data) {
   data.forEach(function(d) {
     d.date = parseDate(d.date);
-    d.value = +d.value;
+    d.value = parseFloat(d.value);
   });
 
   x.domain([new Date(1999, 0, 1), new Date(2003, 0, 0)]);
-  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+  y.domain(d3.extent(data, function(d) { return d.value; }));
   zoom.x(x);
   zoom.y(y);
 
@@ -77,7 +79,14 @@ d3.csv("readme-flights.csv", function(error, data) {
 });
 
 function draw() {
-  svg.select("g.x.axis").call(xAxis);
+  svg.select("g.x.axis").call(xAxis).selectAll("text")
+                                        .style("text-anchor", "end")
+                                        .attr("dx", "-.8em")
+                                        .attr("dy", ".15em")
+                                        .attr("transform", function(d) {
+                                          return "rotate(-90)";
+
+    });
   svg.select("g.y.axis").call(yAxis);
   svg.select("path.line").attr("d", line);
 }

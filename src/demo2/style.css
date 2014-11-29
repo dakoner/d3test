@@ -1,38 +1,30 @@
-
-    svg {
+svg {
     font: 10px sans-serif;
-    }
-
-    .axis {
+}
+.axis {
     shape-rendering: crispEdges;
-    }
-
-    .axis path, .axis line {
+}
+.axis path, .axis line {
     fill: none;
     stroke-width: .5px;
-    }
-
-    .x.axis path {
+}
+.x.axis path {
     stroke: #000;
-    }
-
-    .x.axis line {
+}
+.x.axis line {
     stroke: #fff;
     stroke-opacity: .5;
-    }
-
-    .y.axis line {
+}
+.y.axis line {
     stroke: #ddd;
-    }
-
-    path.line {
+}
+path.line {
     fill: none;
     stroke: #000;
     stroke-width: .5px;
-    }
-
-    rect.pane {
+}
+rect.pane {
     cursor: move;
     fill: none;
     pointer-events: all;
-    }
+}
