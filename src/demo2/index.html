@@ -12,8 +12,13 @@
 
 <div class="tabbable" width="100%" height="100%">
     <ul class="nav nav-tabs">
-        <li class="active"><a class="atab" href="#a_tab" data-toggle="tab">A</a></li>
-        <li><a class="btab" href="#b_tab" data-toggle="tab">B</a></li>
+        <li class="active"><a class="atab" href="#a_tab" data-toggle="tab">Outside temperature</a></li>
+        <li><a class="btab" href="#b_tab" data-toggle="tab">Pressure</a></li>
+        <li><a class="ctab" href="#c_tab" data-toggle="tab">RSSI</a></li>
+        <li><a class="dtab" href="#d_tab" data-toggle="tab">Wind Direction</a></li>
+        <li><a class="etab" href="#e_tab" data-toggle="tab">recv_packets</a></li>
+
+
     </ul>
     <div class="tab-content" width="100%" height="100%">
         <div class="tab-pane active" id="a_tab" width="100%" height="100%">
@@ -23,6 +28,18 @@
         <div class="tab-pane" id="b_tab" width="100%" height="100%">
             <h1>Pressure</h1>
             <bcontent></bcontent>
+        </div>
+        <div class="tab-pane" id="c_tab" width="100%" height="100%">
+            <h1>RSSI</h1>
+            <ccontent></ccontent>
+        </div>
+        <div class="tab-pane" id="d_tab" width="100%" height="100%">
+            <h1>Wind Direction</h1>
+            <dcontent></dcontent>
+        </div>
+        <div class="tab-pane" id="e_tab" width="100%" height="100%">
+            <h1>recv_packets</h1>
+            <econtent></econtent>
         </div>
     </div>
 </div>
@@ -49,6 +66,20 @@
             $(".btab").click(function() {
                 plot("pressure.csv", "pressure", "bcontent");
             })
+
+            $(".ctab").click(function() {
+                plot("rssi.csv", "rssi", "ccontent");
+            })
+
+
+            $(".dtab").click(function() {
+                plot("wind_direction.csv", "wind_direction", "dcontent");
+            })
+
+            $(".etab").click(function() {
+                plot("recv_packets.csv", "recv_packets", "econtent");
+            })
+
 
             plot("outside_temp.csv", "outside_temp", "acontent");
             console.log(",atab=", d3.select(".tabbable").style("height"));

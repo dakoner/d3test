@@ -54,8 +54,8 @@ d3.csv(url, function(error, data) {
      if (varname == "pressure")
       d.var = d.var / 33.86;
     }
-
-
+    if (varname == "rssi")
+          if (d.var < 0) d.var = -d.var;
   });
 
   data = data.filter(function(d) {
