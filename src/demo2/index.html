@@ -4,54 +4,54 @@
 
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <style>
-        svg {
-        font: 10px sans-serif;
-        }
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
 
-        .axis {
-        shape-rendering: crispEdges;
-        }
-
-        .axis path, .axis line {
-        fill: none;
-        stroke-width: .5px;
-        }
-
-        .x.axis path {
-        stroke: #000;
-        }
-
-        .x.axis line {
-        stroke: #fff;
-        stroke-opacity: .5;
-        }
-
-        .y.axis line {
-        stroke: #ddd;
-        }
-
-        path.line {
-        fill: none;
-        stroke: #000;
-        stroke-width: .5px;
-        }
-
-        rect.pane {
-        cursor: move;
-        fill: none;
-        pointer-events: all;
-        }
-    </style>
 </head>
 <body leftmargin="0" topmargin="0" rightmargin="0" bottommargin="0" width="100%" height="100%">
-<div id="body">
-    <div id="footer">
-        <div class="hint">mousewheel to zoom, drag to pan</div>
+
+
+<div class="tabbable">
+    <ul class="nav nav-tabs">
+        <li class="active"><a class="atab" href="#a_tab" data-toggle="tab">A</a></li>
+        <li><a class="btab" href="#b_tab" data-toggle="tab">B</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="a_tab">
+            <h1>A</h1>
+            <acontent></acontent>
+        </div>
+        <div class="tab-pane" id="b_tab">
+            <h1>B</h1>
+            <bcontent></bcontent>
+        </div>
     </div>
 </div>
 
+
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
 <script src="test.js"></script>
-<script>plot("outside_temp.csv", "outside_temp");</script>
+
+<script>
+            $.ajaxSetup ({
+                // Disable caching of AJAX responses
+                // Used when debugging
+                cache: false
+            });
+
+            $(".atab").click(function() {
+                $("acontent").empty();
+                plot("outside_temp.csv", "outside_temp", "acontent");
+            })
+
+            $(".btab").click(function() {
+                $("bcontent").empty();
+                plot("pressure.csv", "pressure", "bcontent");
+            })
+
+            plot("outside_temp.csv", "outside_temp", "acontent");
+</script>
 </body>

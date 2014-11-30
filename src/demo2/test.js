@@ -1,4 +1,7 @@
-function plot(url, varname) {
+function plot(url, varname, tag) {
+
+$(tag).empty();
+
 var margin = {top: 100, right: 100, bottom: 100, left: 100},
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom;
@@ -26,7 +29,7 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
     .y(function(d) { return y(d.var); });
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select(tag).append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
