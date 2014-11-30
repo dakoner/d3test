@@ -9,42 +9,40 @@
 </head>
 <body>
 
-
 <div class="tabbable">
     <ul class="nav nav-tabs">
-        <li class="active"><a class="atab" href="#a_tab" data-toggle="tab">Outside temperature</a></li>
-        <li><a class="btab" href="#b_tab" data-toggle="tab">Pressure</a></li>
-        <li><a class="ctab" href="#c_tab" data-toggle="tab">RSSI</a></li>
-        <li><a class="dtab" href="#d_tab" data-toggle="tab">Wind Direction</a></li>
-        <li><a class="etab" href="#e_tab" data-toggle="tab">recv_packets</a></li>
-        <li><a class="ftab" href="#f_tab" data-toggle="tab">rain_spoons</a></li>
-
+        <li class="active"><a class="outside_temp_tab" href="#outside_temp_tab" data-toggle="tab">Outside temperature</a></li>
+        <li><a class="pressure_tab" href="#pressure_tab" data-toggle="tab">Pressure</a></li>
+        <li><a class="rssi_tab" href="#rssi_tab" data-toggle="tab">RSSI</a></li>
+        <li><a class="wind_direction_tab" href="#wind_direction_tab" data-toggle="tab">Wind Direction</a></li>
+        <li><a class="recv_packets_tab" href="#recv_packets_tab" data-toggle="tab">recv_packets</a></li>
+        <li><a class="rain_spoons_tab" href="#rain_spoons_tab" data-toggle="tab">rain_spoons</a></li>
 
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="a_tab">
+        <div class="tab-pane active" id="outside_temp_tab">
             <h1>Outside Temp</h1>
-            <acontent></acontent>
+            <outside_temp_content></outside_temp_content>
         </div>
-        <div class="tab-pane" id="b_tab">
+        <div class="tab-pane" id="pressure_tab">
             <h1>Pressure</h1>
-            <bcontent></bcontent>
+            <pressure_content></pressure_content>
         </div>
-        <div class="tab-pane" id="c_tab">
+        <div class="tab-pane" id="rssi_tab">
             <h1>RSSI</h1>
-            <ccontent></ccontent>
+            <rssi_content></rssi_content>
         </div>
-        <div class="tab-pane" id="d_tab">
+        <div class="tab-pane" id="wind_direction_tab">
             <h1>Wind Direction</h1>
-            <dcontent></dcontent>
+            <wind_direction_content></wind_direction_content>
         </div>
-        <div class="tab-pane" id="e_tab">
+        <div class="tab-pane" id="recv_packets_tab">
             <h1>recv_packets</h1>
-            <econtent></econtent>
+            <recv_packets_content></recv_packets_content>
         </div>
-        <div class="tab-pane" id="f_tab">
+        <div class="tab-pane" id="rain_spoons_tab">
             <h1>rain_spoons</h1>
-            <fcontent></fcontent>
+            <rain_spoons_content></rain_spoons_content>
         </div>
     </div>
 </div>
@@ -74,33 +72,31 @@ $.when($.ajax("outside_temp.json"),
 		   wind_direction,
 		   recv_packets,
 		   rain_spoons) {
-        $(".atab").click(function() {
-            plot(outside_temp[0], "outside_temp", "acontent");
+        $(".outside_temp_tab").click(function() {
+            plot(outside_temp[0], "outside_temp", "outside_temp_content");
         })
 
-        $(".btab").click(function() {
-            plot(pressure[0], "pressure", "bcontent");
+        $(".pressure_tab").click(function() {
+            plot(pressure[0], "pressure", "pressure_content");
         })
 
-        $(".ctab").click(function() {
-            plot(rssi[0], "rssi", "ccontent");
+        $(".rssi_tab").click(function() {
+            plot(rssi[0], "rssi", "rssi_content");
         })
 
-
-        $(".dtab").click(function() {
-            plot(wind_direction[0], "wind_direction", "dcontent");
+        $(".wind_direction_tab").click(function() {
+            plot(wind_direction[0], "wind_direction", "wind_direction_content");
         })
 
-        $(".etab").click(function() {
-            plot(recv_packets[0], "recv_packets", "econtent");
+        $(".recv_packets_tab").click(function() {
+            plot(recv_packets[0], "recv_packets", "recv_packets_content");
         })
 
-        $(".ftab").click(function() {
-            plot(rain_spoons[0], "rain_spoons", "fcontent");
+        $(".rain_spoons_tab").click(function() {
+            plot(rain_spoons[0], "rain_spoons", "rain_spoons_content");
         })
 
-
-        plot(outside_temp[0], "outside_temp", "acontent");
+        plot(outside_temp[0], "outside_temp", "outside_temp_content");
     });
 </script>
 </body>
