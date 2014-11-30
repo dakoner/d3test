@@ -66,7 +66,6 @@ d3.csv(url, function(error, data) {
     return true;
   });
 
-  console.log(data);
   x.domain([new Date(2014, 10, 13), new Date(2014, 10, 20)]);
   y.domain(d3.extent(data, function(d) { return d.var; }));
 
