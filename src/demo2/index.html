@@ -17,6 +17,7 @@
         <li><a class="ctab" href="#c_tab" data-toggle="tab">RSSI</a></li>
         <li><a class="dtab" href="#d_tab" data-toggle="tab">Wind Direction</a></li>
         <li><a class="etab" href="#e_tab" data-toggle="tab">recv_packets</a></li>
+        <li><a class="ftab" href="#f_tab" data-toggle="tab">rain_spoons</a></li>
 
 
     </ul>
@@ -40,6 +41,10 @@
         <div class="tab-pane" id="e_tab">
             <h1>recv_packets</h1>
             <econtent></econtent>
+        </div>
+        <div class="tab-pane" id="f_tab">
+            <h1>rain_spoons</h1>
+            <fcontent></fcontent>
         </div>
     </div>
 </div>
@@ -80,9 +85,12 @@
                 plot("recv_packets.csv", "recv_packets", "econtent");
             })
 
+            $(".ftab").click(function() {
+                plot("rain_spoons.csv", "rain_spoons", "fcontent");
+            })
+
 
             plot("outside_temp.csv", "outside_temp", "acontent");
-            console.log(",atab=", d3.select(".tabbable").style("height"));
 
 </script>
 </body>
