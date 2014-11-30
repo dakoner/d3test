@@ -2,9 +2,9 @@ function plot(url, varname, tag) {
 
 $(tag).empty();
 
-var margin = {top: 100, right: 100, bottom: 100, left: 100},
-    width = window.innerWidth - margin.left - margin.right,
-    height = window.innerHeight - margin.top - margin.bottom;
+var margin = {top: 20, right: 30, bottom: 80, left: 10},
+    width = 1500 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse,
     formatDate = d3.time.format("%Y-%m-%d");
@@ -35,25 +35,24 @@ var svg = d3.select(tag).append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-
 svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")");
 
-
 svg.append("g")
     .attr("class", "y axis")
-    .attr("transform", "translate(" + width + ",0)");
-
+    .attr("transform", "translate(" + width + ", 0)");
 
 d3.csv(url, function(error, data) {
   data.forEach(function(d) {
     d.date = parseDate(d.created_at);
     d.var = parseFloat(d[varname]);
+    if (d.us_units == 0)
+    // TODO(dek): correct for pressure.
+      d.var = d.var * 9 / 5. + 32.;
   });
 
-  x.domain([new Date(2014, 10, 27), new Date(2014, 11, 0)]);
+  x.domain([new Date(2014, 10, 13), new Date(2014, 10, 20)]);
   y.domain(d3.extent(data, function(d) { return d[varname]; }));
 
 
@@ -64,12 +63,22 @@ d3.csv(url, function(error, data) {
   var color = d3.scale.category10();
   legendSpace = width/dataNest.length; // spacing for legend
 
+/*
+  svg.append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("x", x(0))
+    .attr("y", y(1))
+    .attr("width", x(1) - x(0))
+    .attr("height", y(0) - y(1));
+*/
   dataNest.forEach(function(d, i) {
                 svg.append("path")
                     .attr("class", "line")
                     .style("stroke", function() {
                                     return d.color = color(d.key); })
-                    .attr("d", line(d.values));
+                    .attr("d", line(d.values))
+                    .attr("clip-path", "url(#clip)");
 
                 svg.append("text")
                     .attr("x", (legendSpace/2)+i*legendSpace) // spacing
@@ -99,6 +108,9 @@ d3.csv(url, function(error, data) {
 
   var zoom = d3.behavior.zoom()
     .on("zoom", draw);
+
+
+
 
   svg.append("rect")
     .attr("class", "pane")
