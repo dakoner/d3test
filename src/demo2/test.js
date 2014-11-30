@@ -90,15 +90,7 @@ d3.csv("outside_temp.csv", function(error, data) {
       svg.selectAll("path.line")[0].forEach(function(d, i) {
         d.attributes['d'].value=line(dataNest[i].values);
       });
-/*
-      svg.select("path.line").attr("d", function(d) {
-        s = [];
-        dataNest.forEach(function(x, i) {
-            s.push(line(x.values));
-        });
-        return s;
-    });
-*/
+
   }
 
   var zoom = d3.behavior.zoom()
