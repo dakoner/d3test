@@ -113,6 +113,7 @@ function plot(data, varname, tag) {
             });
 	svg.select("g.y.axis").call(yAxis);
 
+	console.log(svg.selectAll("path.line"))
 	svg.selectAll("path.line")[0].forEach(function(d, i) {
 	    d.attributes['d'].value=line(dataNest[i].values);
 	});

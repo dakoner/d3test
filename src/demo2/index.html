@@ -4,7 +4,7 @@
 
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="bootstrap-combined.min.css" rel="stylesheet">
 
 </head>
 <body>
@@ -54,49 +54,5 @@
 <script src="bootstrap.min.js"></script>
 
 <script src="test.js"></script>
-<script>
-$.ajaxSetup ({
-    // Disable caching of AJAX responses
-    // Used when debugging
-    cache: false
-});
-$.when($.ajax("outside_temp.json"),
-       $.ajax("pressure.json"),
-       $.ajax("rssi.json"),
-       $.ajax("wind_direction.json"),
-       $.ajax("recv_packets.json"),
-       $.ajax("rain_spoons.json"))
-    .done(function(outside_temp,
-		   pressure,
-		   rssi,
-		   wind_direction,
-		   recv_packets,
-		   rain_spoons) {
-        $(".outside_temp_tab").click(function() {
-            plot(outside_temp[0], "outside_temp", "outside_temp_content");
-        })
-
-        $(".pressure_tab").click(function() {
-            plot(pressure[0], "pressure", "pressure_content");
-        })
-
-        $(".rssi_tab").click(function() {
-            plot(rssi[0], "rssi", "rssi_content");
-        })
-
-        $(".wind_direction_tab").click(function() {
-            plot(wind_direction[0], "wind_direction", "wind_direction_content");
-        })
-
-        $(".recv_packets_tab").click(function() {
-            plot(recv_packets[0], "recv_packets", "recv_packets_content");
-        })
-
-        $(".rain_spoons_tab").click(function() {
-            plot(rain_spoons[0], "rain_spoons", "rain_spoons_content");
-        })
-
-        plot(outside_temp[0], "outside_temp", "outside_temp_content");
-    });
-</script>
+<script src="test2.js"></script>
 </body>
