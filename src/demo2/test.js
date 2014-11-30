@@ -47,13 +47,28 @@ d3.csv(url, function(error, data) {
   data.forEach(function(d) {
     d.date = parseDate(d.created_at);
     d.var = parseFloat(d[varname]);
-    if (d.us_units == 0)
+    if (d.us_units == 0) {
+     if (varname == "outside_temp")
     // TODO(dek): correct for pressure.
       d.var = d.var * 9 / 5. + 32.;
+     if (varname == "pressure")
+      d.var = d.var / 33.86;
+    }
+
+
   });
 
+  data = data.filter(function(d) {
+    if (varname == "pressure")
+      return d.var > 20 && d.var < 35;
+    if (varname == "outside_temp")
+      return d.var > 20 && d.var < 100;
+    return true;
+  });
+
+  console.log(data);
   x.domain([new Date(2014, 10, 13), new Date(2014, 10, 20)]);
-  y.domain(d3.extent(data, function(d) { return d[varname]; }));
+  y.domain(d3.extent(data, function(d) { return d.var; }));
 
 
    var dataNest = d3.nest()
