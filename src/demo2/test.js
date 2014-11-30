@@ -1,3 +1,4 @@
+function plot(url, varname) {
 var margin = {top: 100, right: 100, bottom: 100, left: 100},
     width = window.innerWidth - margin.left - margin.right,
     height = window.innerHeight - margin.top - margin.bottom;
@@ -23,7 +24,7 @@ var yAxis = d3.svg.axis()
 
 var line = d3.svg.line()
     .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.outside_temp); });
+    .y(function(d) { return y(d.var); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -43,14 +44,14 @@ svg.append("g")
     .attr("transform", "translate(" + width + ",0)");
 
 
-d3.csv("outside_temp.csv", function(error, data) {
+d3.csv(url, function(error, data) {
   data.forEach(function(d) {
     d.date = parseDate(d.created_at);
-    d.outside_temp = parseFloat(d.outside_temp);
+    d.var = parseFloat(d[varname]);
   });
 
   x.domain([new Date(2014, 10, 27), new Date(2014, 11, 0)]);
-  y.domain(d3.extent(data, function(d) { return d.outside_temp; }));
+  y.domain(d3.extent(data, function(d) { return d[varname]; }));
 
 
    var dataNest = d3.nest()
@@ -106,4 +107,5 @@ d3.csv("outside_temp.csv", function(error, data) {
 
   draw();
 });
+}
 
