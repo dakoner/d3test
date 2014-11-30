@@ -51,46 +51,56 @@
 
 
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+<script src="d3.v3.min.js"></script>
+<script src="bootstrap.min.js"></script>
 
 <script src="test.js"></script>
-
 <script>
-            $.ajaxSetup ({
-                // Disable caching of AJAX responses
-                // Used when debugging
-                cache: false
-            });
+$.ajaxSetup ({
+    // Disable caching of AJAX responses
+    // Used when debugging
+    cache: false
+});
+$.when($.ajax("outside_temp.json"),
+       $.ajax("pressure.json"),
+       $.ajax("rssi.json"),
+       $.ajax("wind_direction.json"),
+       $.ajax("recv_packets.json"),
+       $.ajax("rain_spoons.json"))
+    .done(function(outside_temp,
+		   pressure,
+		   rssi,
+		   wind_direction,
+		   recv_packets,
+		   rain_spoons) {
+        $(".atab").click(function() {
+            plot(outside_temp[0], "outside_temp", "acontent");
+        })
 
-            $(".atab").click(function() {
-                plot("outside_temp.csv", "outside_temp", "acontent");
-            })
+        $(".btab").click(function() {
+            plot(pressure[0], "pressure", "bcontent");
+        })
 
-            $(".btab").click(function() {
-                plot("pressure.csv", "pressure", "bcontent");
-            })
-
-            $(".ctab").click(function() {
-                plot("rssi.csv", "rssi", "ccontent");
-            })
-
-
-            $(".dtab").click(function() {
-                plot("wind_direction.csv", "wind_direction", "dcontent");
-            })
-
-            $(".etab").click(function() {
-                plot("recv_packets.csv", "recv_packets", "econtent");
-            })
-
-            $(".ftab").click(function() {
-                plot("rain_spoons.csv", "rain_spoons", "fcontent");
-            })
+        $(".ctab").click(function() {
+            plot(rssi[0], "rssi", "ccontent");
+        })
 
 
-            plot("outside_temp.csv", "outside_temp", "acontent");
+        $(".dtab").click(function() {
+            plot(wind_direction[0], "wind_direction", "dcontent");
+        })
 
+        $(".etab").click(function() {
+            plot(recv_packets[0], "recv_packets", "econtent");
+        })
+
+        $(".ftab").click(function() {
+            plot(rain_spoons[0], "rain_spoons", "fcontent");
+        })
+
+
+        plot(outside_temp[0], "outside_temp", "acontent");
+    });
 </script>
 </body>
