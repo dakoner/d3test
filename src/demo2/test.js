@@ -65,7 +65,7 @@ function plot(data, varname, tag) {
 	return true;
     });
 
-    x.domain([new Date(2014, 10, 13), new Date(2014, 10, 20)]);
+    x.domain([new Date(2014, 10, 1), new Date(2014, 10, 30)]);
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
 
