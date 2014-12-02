@@ -47,7 +47,7 @@ function plot(data, varname, tag) {
 	d.date = new Date(d.created_at);
 	d.var = parseFloat(d[varname]);
 	if (d.us_units == 0) {
-	    if (varname == "outside_temp")
+	    if (varname == "outside_temp" || varname == "inside_temp")
 		// TODO(dek): correct for pressure.
 		d.var = d.var * 9 / 5. + 32.;
 	    if (varname == "pressure")
@@ -60,12 +60,12 @@ function plot(data, varname, tag) {
     data = data.filter(function(d) {
 	if (varname == "pressure")
 	    return d.var > 20 && d.var < 35;
-	if (varname == "outside_temp")
-	    return d.var > 20 && d.var < 100;
+	if (varname == "outside_temp" || varname == "inside_temp")
+	    return d.var > 10 && d.var < 100;
 	return true;
     });
 
-    x.domain([new Date(2014, 10, 1), new Date(2014, 10, 30)]);
+    x.domain([new Date(2014, 10, 1), new Date(2014, 11, 1)]);
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
 
