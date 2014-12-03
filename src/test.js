@@ -65,7 +65,7 @@ function plot(data, varname, tag) {
 	return true;
     });
 
-    x.domain([new Date(2014, 10, 1), new Date(2014, 11, 1)]);
+    x.domain(d3.extent(data, function(d) { return d.created_at; }));
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
 
@@ -76,15 +76,14 @@ function plot(data, varname, tag) {
     var color = d3.scale.category10();
     legendSpace = width/dataNest.length; // spacing for legend
 
-    /*
-      svg.append("clipPath")
-      .attr("id", "clip")
-      .append("rect")
-      .attr("x", x(0))
-      .attr("y", y(1))
-      .attr("width", x(1) - x(0))
-      .attr("height", y(0) - y(1));
-    */
+    svg.append("clipPath")
+    	.attr("id", "clip")
+    	.append("rect")
+    	.attr("x", 0)
+    	.attr("y", 0)
+    	.attr("width", width)
+    	.attr("height", height)
+    
     dataNest.forEach(function(d, i) {
 	svg.append("path")
 	    .attr("class", "line")
