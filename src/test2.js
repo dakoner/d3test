@@ -8,7 +8,7 @@ var list = [ 'outside_temp', 'pressure', 'rssi', 'wind_direction', 'recv_packets
 
 
 var startDate = new Date("2014-10-17");
-var endDate = new Date("2014-12-10");
+var endDate = new Date("2014-12-12");
 var date = startDate;
 var dates = [];
 function pad(n){return n<10 ? '0'+n : n}
@@ -18,11 +18,10 @@ while(date <= endDate) {
     date.setDate(date.getDate() + 1);
 }
 
-console.log(dates);
 var ajax_list = []
 for (var i = 0; i < dates.length; i++) {
     var n = dates[i];
-    var v = $.ajax(n + ".json");
+    var v = $.ajax("data/" + n + ".json");
     ajax_list.push(v);
 }
 

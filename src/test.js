@@ -77,9 +77,14 @@ function plot(data, varname, tag) {
 	return true;
     });
 
-    console.log(d3.extent(data, function(d) { return d.date; }))
-    console.log(d3.extent(data, function(d) { return d.var; }))
-    x.domain(d3.extent(data, function(d) { return d.date; }));
+    // x.domain(d3.extent(data, function(d) { return d.date; }));
+    var dx = data.map(function(d) { return d.date; })
+    var lastdate = new Date(Math.max.apply(null, dx));
+    var daybefore = new Date(Math.max.apply(null, dx));
+    daybefore.setDate(daybefore.getDate()-7);
+    console.log(lastdate)
+    console.log(daybefore)
+    x.domain([daybefore,lastdate])
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
     var dataNest = d3.nest()
