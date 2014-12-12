@@ -6,11 +6,28 @@ $.ajaxSetup ({
 
 var list = [ 'outside_temp', 'pressure', 'rssi', 'wind_direction', 'recv_packets', 'rain_spoons', 'heatindex', 'inside_humidity', 'inside_temp', 'outside_humidity', 'rain', 'solar_wm2', 'uv_index', 'wind_gust', 'wind_gust_direction', 'wind_speed' ]
 
+
+var startDate = new Date("2014-10-17");
+var endDate = new Date("2014-12-10");
+var date = startDate;
+var dates = [];
+function pad(n){return n<10 ? '0'+n : n}
+while(date <= endDate) {
+    var s = date.getFullYear() + "-" + pad(date.getMonth()+1) + "-" + pad(date.getDate());
+    dates.push(s);
+    date.setDate(date.getDate() + 1);
+}
+
+console.log(dates);
 var ajax_list = []
-for (var i = 0; i < list.length; i++) {
-    var n = list[i];
+for (var i = 0; i < dates.length; i++) {
+    var n = dates[i];
     var v = $.ajax(n + ".json");
     ajax_list.push(v);
+}
+
+for (var i = 0; i < list.length; i++) {
+    var n = list[i];
     p = "tab-pane";
     if (i == 0) p += " active";
     d3.select(".nav-tabs").append("li")
@@ -33,14 +50,21 @@ function createfunc(v, n) {
 }
 $.when.apply($, ajax_list)
     .done(function() {
-	plot(arguments[0][0], list[0], list[0] + "_content");
+	var weatherdatas = [];
 	for (var i = 0; i < arguments.length; i++) {
+	    weatherdatas.push(arguments[i][0].weatherdata);
+	}
+	var data = Array.prototype.concat.apply([], weatherdatas);
+	
+	plot(data, list[0], list[0] + "_content");
+	for (var i = 0; i < list.length; i++) {
 	    tab = $("." + list[i] + "_tab");
-	    var v = arguments[i][0];
+	    var v = data;
 	    var n = list[i]
 	    // external func required to bind value of v, n
 	    tab.click(createfunc(v, n))
-	}})
+	}
+    })
     .fail(function(e) {
 	console.log("Err..." + e);
     });

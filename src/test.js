@@ -6,7 +6,7 @@ function plot(data, varname, tag) {
 	width = 1500 - margin.left - margin.right,
 	height = 500 - margin.top - margin.bottom;
 
-    var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse,
+    var parseDate = d3.time.format("%a, %d %b %Y %H:%M:%S -0000").parse,
 	formatDate = d3.time.format("%Y-%m-%d");
 
     var x = d3.time.scale()
@@ -24,10 +24,16 @@ function plot(data, varname, tag) {
 	.scale(y)
 	.orient("right")
 
-
+    function fx(d) {
+	return x(d.date);
+    }
+    function fy(d) {
+	return y(d.var);
+    }
+    
     var line = d3.svg.line()
-	.x(function(d) { return x(d.date); })
-	.y(function(d) { return y(d.var); });
+	.x(fx)
+	.y(fy);
 
     var svg = d3.select(tag).append("svg")
 	.attr("width", width + margin.left + margin.right)
@@ -43,20 +49,26 @@ function plot(data, varname, tag) {
 	.attr("class", "y axis")
 	.attr("transform", "translate(" + width + ", 0)");
 
+    var newData = [];
     data.forEach(function(d) {
-	d.date = new Date(d.created_at);
-	d.var = parseFloat(d[varname]);
+	var item = new Object;
+	item.date = parseDate(d.created_at);
+	item.var = parseFloat(d[varname]);
+	item.station = new Object();
+	item.station.uuid = d.station.uuid;
 	if (d.us_units == 0) {
 	    if (varname == "outside_temp" || varname == "inside_temp")
-		// TODO(dek): correct for pressure.
-		d.var = d.var * 9 / 5. + 32.;
+		item.var = item.var * 9 / 5. + 32.;
 	    if (varname == "pressure")
-		d.var = d.var / 33.86;
+		item.var = item.var / 33.86;
 	}
 	if (varname == "rssi")
-            if (d.var < 0) d.var = -d.var;
+            if (item.var < 0) item.var = -item.var;
+	newData.push(item);
     });
 
+    var oldData = data;
+    data = newData;
     data = data.filter(function(d) {
 	if (varname == "pressure")
 	    return d.var > 20 && d.var < 35;
@@ -65,12 +77,13 @@ function plot(data, varname, tag) {
 	return true;
     });
 
-    x.domain(d3.extent(data, function(d) { return d.created_at; }));
+    console.log(d3.extent(data, function(d) { return d.date; }))
+    console.log(d3.extent(data, function(d) { return d.var; }))
+    x.domain(d3.extent(data, function(d) { return d.date; }));
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
-
     var dataNest = d3.nest()
-	.key(function(d) { return d["station.uuid"]; })
+	.key(function(d) { return d.station.uuid; })
 	.entries(data);
 
     var color = d3.scale.category10();
@@ -83,13 +96,14 @@ function plot(data, varname, tag) {
     	.attr("y", 0)
     	.attr("width", width)
     	.attr("height", height)
-    
+
     dataNest.forEach(function(d, i) {
+        var l = line(d.values);
 	svg.append("path")
 	    .attr("class", "line")
 	    .style("stroke", function() {
                 return d.color = color(d.key); })
-	    .attr("d", line(d.values))
+	    .attr("d", l)
 	    .attr("clip-path", "url(#clip)");
 
 	svg.append("text")
@@ -99,8 +113,7 @@ function plot(data, varname, tag) {
 	    .style("fill", function() {
 		return d.color = color(d.key); })
 	    .text(d.key);
-    }
-		    );
+    });
 
     var draw = function() {
 	svg.select("g.x.axis").call(xAxis).selectAll("text")
@@ -112,7 +125,6 @@ function plot(data, varname, tag) {
             });
 	svg.select("g.y.axis").call(yAxis);
 
-	console.log(svg.selectAll("path.line"))
 	svg.selectAll("path.line")[0].forEach(function(d, i) {
 	    d.attributes['d'].value=line(dataNest[i].values);
 	});
@@ -120,9 +132,6 @@ function plot(data, varname, tag) {
 
     var zoom = d3.behavior.zoom()
 	.on("zoom", draw);
-
-
-
 
     svg.append("rect")
 	.attr("class", "pane")
