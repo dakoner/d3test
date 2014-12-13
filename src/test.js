@@ -81,9 +81,7 @@ function plot(data, varname, tag) {
     var dx = data.map(function(d) { return d.date; })
     var lastdate = new Date(Math.max.apply(null, dx));
     var daybefore = new Date(Math.max.apply(null, dx));
-    daybefore.setDate(daybefore.getDate()-7);
-    console.log(lastdate)
-    console.log(daybefore)
+    daybefore.setDate(daybefore.getDate()-1);
     x.domain([daybefore,lastdate])
     y.domain(d3.extent(data, function(d) { return d.var; }));
 
