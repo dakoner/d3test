@@ -19,7 +19,6 @@ function plot(data, varname, tag) {
 	.scale(x)
 	.orient("bottom")
 
-
     var yAxis = d3.svg.axis()
 	.scale(y)
 	.orient("right")
@@ -77,13 +76,20 @@ function plot(data, varname, tag) {
 	return true;
     });
 
+    data.sort(function(a, b) {
+	return a.date>b.date ? 1 : a.date<b.date ? -1 : 0;
+    });
+
     // x.domain(d3.extent(data, function(d) { return d.date; }));
     var dx = data.map(function(d) { return d.date; })
+    var firstdate = new Date(Math.min.apply(null, dx));
     var lastdate = new Date(Math.max.apply(null, dx));
     var daybefore = new Date(Math.max.apply(null, dx));
     daybefore.setDate(daybefore.getDate()-1);
     x.domain([daybefore,lastdate])
-    y.domain(d3.extent(data, function(d) { return d.var; }));
+    // console.log(firstdate + " ++ " + lastdate)
+    var dy = data.map(function(d) { return d.var; })
+    y.domain(d3.extent(dy));
 
     var dataNest = d3.nest()
 	.key(function(d) { return d.station.uuid; })
@@ -119,18 +125,42 @@ function plot(data, varname, tag) {
     });
 
     var draw = function() {
-	svg.select("g.x.axis").call(xAxis).selectAll("text")
-            .style("text-anchor", "end")
-            .attr("dx", "-.8em")
-            .attr("dy", ".15em")
-            .attr("transform", function(d) {
-                return "rotate(-90)";
-            });
-	svg.select("g.y.axis").call(yAxis);
-
-	svg.selectAll("path.line")[0].forEach(function(d, i) {
-	    d.attributes['d'].value=line(dataNest[i].values);
-	});
+	if (d3.event != null) {
+	    translate = d3.event.translate
+        } else {
+	    translate = [0,0]
+	}
+	// console.log("translate=" + translate)
+	// console.log("x.invert=" + x.invert(      - translate[0]))
+	// console.log("x.invert=" + x.invert(width - translate[0]))
+	// console.log("firstdate=" + firstdate)
+	// console.log("lastdate=" + lastdate)
+	if (x.invert(      - translate[0]) >= firstdate &&
+	    x.invert(width - translate[0]) <= lastdate) {
+	    // want to convert from the positions (-translate[0],  (width - translate[0]))
+	    // to the range of locations in data.val
+	    var start = d3.bisectLeft(dx, x.invert(- translate[0]))
+	    var end = d3.bisect(dx, x.invert(width - translate[0]))
+	    console.log("start=", start)
+	    console.log("end=", end)
+	    var e = d3.extent(dy.slice(start,end))
+	    console.log("extent=", e)
+	    // e[0] -= (e[0] / 10.)
+	    // e[1] += (e[1] / 10.)
+	    // y.domain(e);
+	    // console.log(x.invert(0) + " -- " + x.invert(width))
+	    svg.select("g.x.axis").call(xAxis).selectAll("text")
+		.style("text-anchor", "end")
+		.attr("dx", "-.8em")
+		.attr("dy", ".15em")
+		.attr("transform", function(d) {
+                    return "rotate(-90)";
+		});
+	    svg.select("g.y.axis").call(yAxis);
+	    svg.selectAll("path.line")[0].forEach(function(d, i) {
+		d.attributes['d'].value=line(dataNest[i].values);
+	    });
+	}
     }
 
     var zoom = d3.behavior.zoom()
