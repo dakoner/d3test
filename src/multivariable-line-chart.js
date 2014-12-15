@@ -1,53 +1,76 @@
+// Add an SVG line chart defined by data (via its property specified
+// by varname into HTML element tag.
 function plot(data, varname, tag) {
-
+    // Empty the target HTML element before populating it.
     $(tag).empty();
 
+    // Margins make space for areas outside the chart The width and
+    // height of the chart needs to account for them.  
+    // TODO(dek): get the actual width and height we can occupy based
+    // on screen dimensions
     var margin = {top: 20, right: 30, bottom: 80, left: 10},
 	width = 1500 - margin.left - margin.right,
 	height = 500 - margin.top - margin.bottom;
 
-    var parseDate = d3.time.format("%a, %d %b %Y %H:%M:%S -0000").parse,
-	formatDate = d3.time.format("%Y-%m-%d");
+    // parseDate is used to turn the dates in JSON fields such as
+    // created_at into JS dates
+    var parseDate = d3.time.format("%a, %d %b %Y %H:%M:%S -0000").parse
 
+    // X scale is time-based.  It maps between the data's X-axis domain
+    // (defined by the earliest and latest timestamps in the data) and
+    // the viewport's width.
     var x = d3.time.scale()
 	.range([0, width]);
 
+    // Y scale is linear.  It maps between the data's Y-axis domain
+    // (defined by the extreme values for a variable) and the
+    // viewport's height.
     var y = d3.scale.linear()
 	.range([height, 0]);
 
+    // Define the location and scale of the rendered X axis
     var xAxis = d3.svg.axis()
 	.scale(x)
 	.orient("bottom")
 
+    // Define the location and scale of the rendered Y axis
     var yAxis = d3.svg.axis()
 	.scale(y)
 	.orient("right")
 
+    // These functions map date values (either X-axis or Y-axis) to
+    // their scaled values
     function fx(d) {
 	return x(d.date);
     }
     function fy(d) {
 	return y(d.var);
     }
-    
+
+    // Define a SVG line (path) used to render the line chart data
     var line = d3.svg.line()
 	.x(fx)
 	.y(fy);
 
+    // Create an SVG tag used to contain the entire chart.
     var svg = d3.select(tag).append("svg")
 	.attr("width", width + margin.left + margin.right)
 	.attr("height", height + margin.top + margin.bottom)
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // Append an SVG group used to contain the X axis
     svg.append("g")
 	.attr("class", "x axis")
 	.attr("transform", "translate(0," + height + ")");
 
+    // Append an SVG group used to contain the Y axis
     svg.append("g")
 	.attr("class", "y axis")
 	.attr("transform", "translate(" + width + ", 0)");
 
+    // Extract and clean the data (X- and Y-axis values) from the passed-in
+    // data, in a data structure that is ready to be passed to D3.
     var newData = [];
     data.forEach(function(d) {
 	var item = new Object;
@@ -68,6 +91,8 @@ function plot(data, varname, tag) {
 
     var oldData = data;
     data = newData;
+
+    // Filter the data based on reasonable ranges.
     data = data.filter(function(d) {
 	if (varname == "pressure")
 	    return d.var > 20 && d.var < 35;
@@ -76,28 +101,39 @@ function plot(data, varname, tag) {
 	return true;
     });
 
+    // Sort the data (by timestamp) since the subsequent code requires it.
     data.sort(function(a, b) {
 	return a.date>b.date ? 1 : a.date<b.date ? -1 : 0;
     });
 
-    // x.domain(d3.extent(data, function(d) { return d.date; }));
     var dx = data.map(function(d) { return d.date; })
     var firstdate = new Date(Math.min.apply(null, dx));
     var lastdate = new Date(Math.max.apply(null, dx));
     var daybefore = new Date(Math.max.apply(null, dx));
+    // Day before the last day.
     daybefore.setDate(daybefore.getDate()-1);
+    // Set the X domain from a time range.  The initially rendered
+    // graph will show data within this timespan
     x.domain([daybefore,lastdate])
-    // console.log(firstdate + " ++ " + lastdate)
+    // Alternative which renders the entire timespan
+    // x.domain(d3.extent(data, function(d) { return d.date; }));
+
+    // Set the Y domain based on the extent of the values.
     var dy = data.map(function(d) { return d.var; })
     y.domain(d3.extent(dy));
 
+    // All the observations in data are tagged by a station UUID.  To
+    // implement a chart where each station has an independent line,
+    // we "nest" (group) the data, using the UUID as key.
     var dataNest = d3.nest()
 	.key(function(d) { return d.station.uuid; })
 	.entries(data);
 
+    // Define the color collection for the data groups
     var color = d3.scale.category10();
-    legendSpace = width/dataNest.length; // spacing for legend
 
+    // Define a clip rectangle that covers the data.  This is used to
+    // erase SVG line chart rendering outside the chart area.
     svg.append("clipPath")
     	.attr("id", "clip")
     	.append("rect")
@@ -106,6 +142,9 @@ function plot(data, varname, tag) {
     	.attr("width", width)
     	.attr("height", height)
 
+    // Build SVG lines and legend text for each station's variable
+    legendSpace = width/dataNest.length;
+    // TODO(dek): determine if we only need to do this for the initially visible group
     dataNest.forEach(function(d, i) {
         var l = line(d.values);
 	svg.append("path")
