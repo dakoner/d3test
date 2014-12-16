@@ -144,14 +144,15 @@ function plot(data, varname, tag) {
 
     // Build SVG lines and legend text for each station's variable
     legendSpace = width/dataNest.length;
-    // TODO(dek): determine if we only need to do this for the initially visible group
+    // TODO(dek): determine if we only need to do this for the initially visible variable
     dataNest.forEach(function(d, i) {
-        var l = line(d.values);
 	svg.append("path")
 	    .attr("class", "line")
 	    .style("stroke", function() {
+		// Each line will be colored by index into the color
+		// array we defined earlier.
                 return d.color = color(d.key); })
-	    .attr("d", l)
+	    .attr("d", line(d.values))
 	    .attr("clip-path", "url(#clip)");
 
 	svg.append("text")
@@ -159,35 +160,35 @@ function plot(data, varname, tag) {
 	    .attr("y", height + (margin.bottom/2)+ 25)
 	    .attr("class", "legend")
 	    .style("fill", function() {
+		// Each legend entry will be colored by index into the color
+		// array we defined earlier.
 		return d.color = color(d.key); })
 	    .text(d.key);
     });
 
+    // Main redraw function for an individual chart
     var draw = function() {
+	// Figure out the current panning of the chart.
 	if (d3.event != null) {
 	    translate = d3.event.translate
         } else {
 	    translate = [0,0]
 	}
-	// console.log("translate=" + translate)
-	// console.log("x.invert=" + x.invert(      - translate[0]))
-	// console.log("x.invert=" + x.invert(width - translate[0]))
-	// console.log("firstdate=" + firstdate)
-	// console.log("lastdate=" + lastdate)
+	// Check to see if the pan is legal (doesn't try to pan
+	// missing data at the start or end)
 	if (x.invert(      - translate[0]) >= firstdate &&
 	    x.invert(width - translate[0]) <= lastdate) {
-	    // want to convert from the positions (-translate[0],  (width - translate[0]))
-	    // to the range of locations in data.val
-	    var start = d3.bisectLeft(dx, x.invert(- translate[0]))
-	    var end = d3.bisect(dx, x.invert(width - translate[0]))
-	    console.log("start=", start)
-	    console.log("end=", end)
-	    var e = d3.extent(dy.slice(start,end))
-	    console.log("extent=", e)
+	    // TODO(dek): make this test code work to rescale the
+	    // chart's y domain to the local Y extrema as it is panned
+	    // var start = d3.bisectLeft(dx, x.invert(- translate[0]))
+	    // var end = d3.bisect(dx, x.invert(width - translate[0]))
+	    // var e = d3.extent(dy.slice(start,end))
 	    // e[0] -= (e[0] / 10.)
 	    // e[1] += (e[1] / 10.)
 	    // y.domain(e);
 	    // console.log(x.invert(0) + " -- " + x.invert(width))
+
+	    // Update and rotate the X axis labels (necessary if panning)
 	    svg.select("g.x.axis").call(xAxis).selectAll("text")
 		.style("text-anchor", "end")
 		.attr("dx", "-.8em")
@@ -195,22 +196,34 @@ function plot(data, varname, tag) {
 		.attr("transform", function(d) {
                     return "rotate(-90)";
 		});
+
+	    // Update the Y axis (probably not necessary if we don't rescale the Y axis)
 	    svg.select("g.y.axis").call(yAxis);
+
+	    // update the data embedded in the SVG element which
+	    // displayes the line chart with the current values.  This
+	    // is necessary if panning, to ensure the path is updated
+	    // with the current transformation
 	    svg.selectAll("path.line")[0].forEach(function(d, i) {
 		d.attributes['d'].value=line(dataNest[i].values);
 	    });
 	}
     }
 
+    // Set up zoom behavior
     var zoom = d3.behavior.zoom()
 	.on("zoom", draw);
 
+    // Build an SVG element that contains the zoom behavior
     svg.append("rect")
 	.attr("class", "pane")
 	.attr("width", width)
 	.attr("height", height)
 	.call(zoom);
+    // Panning and zooming only affect X axis, not Y axis.
     zoom.x(x);
+
+    // Required for the very first view of the chart to be rendered
     draw();
 }
 
@@ -220,20 +233,26 @@ $.ajaxSetup ({
     cache: false
 });
 
+// List of variables that have tabs and are charted
 var list = [ 'outside_temp', 'pressure', 'rssi', 'wind_direction', 'recv_packets', 'rain_spoons', 'heatindex', 'inside_humidity', 'inside_temp', 'outside_humidity', 'rain', 'solar_wm2', 'uv_index', 'wind_gust', 'wind_gust_direction', 'wind_speed' ]
 
-
+// Date range to chart
 var startDate = new Date("2014-10-17");
-var endDate = new Date("2014-12-14");
+var endDate = new Date("2014-12-17");
 var date = startDate;
-var dates = [];
+
 function pad(n){return n<10 ? '0'+n : n}
+
+// List all the dates.  It might be possible to merge this code with
+// the next for loop.
+var dates = [];
 while(date < endDate) {
     var s = date.getFullYear() + "-" + pad(date.getMonth()+1) + "-" + pad(date.getDate());
     dates.push(s);
     date.setDate(date.getDate() + 1);
 }
 
+// Add all the data files to a list that will be fetched via Ajax.
 var ajax_list = []
 for (var i = 0; i < dates.length; i++) {
     var n = dates[i];
@@ -241,6 +260,7 @@ for (var i = 0; i < dates.length; i++) {
     ajax_list.push(v);
 }
 
+// Set up all the variable tabs
 for (var i = 0; i < list.length; i++) {
     var n = list[i];
     p = "tab-pane";
@@ -257,12 +277,17 @@ for (var i = 0; i < list.length; i++) {
 	.append(n + "_content")
 }
 
+// Function that is called when user clicks on a tab to render a variable's chart
 function createfunc(v, n) {
     return function() { 
 	console.log("executing click for: ", n);
 	plot(v, n, n + "_content");
     }
 }
+
+// Submit many AJAX requests in parallel, executing a done function
+// when finished (or an error function).  Plots the first tab, and
+// sets click handlers for plotting all the other tabs.
 $.when.apply($, ajax_list)
     .done(function() {
 	var weatherdatas = [];
