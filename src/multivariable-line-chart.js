@@ -8,9 +8,9 @@ function plot(data, varname, tag) {
     // height of the chart needs to account for them.  
     // TODO(dek): get the actual width and height we can occupy based
     // on screen dimensions
-    var margin = {top: 20, right: 30, bottom: 80, left: 10},
-	width = 1500 - margin.left - margin.right,
-	height = 500 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 30, bottom: 80, left: 10};
+    var width = 1500 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
 
     // parseDate is used to turn the dates in JSON fields such as
     // created_at into JS dates
@@ -85,7 +85,7 @@ function plot(data, varname, tag) {
 		item.var = item.var / 33.86;
 	}
 	if (varname == "rssi")
-            if (item.var < 0) item.var = -item.var;
+	    if (item.var < 0) item.var = -item.var;
 	newData.push(item);
     });
 
@@ -135,12 +135,12 @@ function plot(data, varname, tag) {
     // Define a clip rectangle that covers the data.  This is used to
     // erase SVG line chart rendering outside the chart area.
     svg.append("clipPath")
-    	.attr("id", "clip")
-    	.append("rect")
-    	.attr("x", 0)
-    	.attr("y", 0)
-    	.attr("width", width)
-    	.attr("height", height)
+	.attr("id", "clip")
+	.append("rect")
+	.attr("x", 0)
+	.attr("y", 0)
+	.attr("width", width)
+	.attr("height", height)
 
     // Build SVG lines and legend text for each station's variable
     legendSpace = width/dataNest.length;
@@ -151,7 +151,7 @@ function plot(data, varname, tag) {
 	    .style("stroke", function() {
 		// Each line will be colored by index into the color
 		// array we defined earlier.
-                return d.color = color(d.key); })
+		return d.color = color(d.key); })
 	    .attr("d", line(d.values))
 	    .attr("clip-path", "url(#clip)");
 
@@ -171,7 +171,7 @@ function plot(data, varname, tag) {
 	// Figure out the current panning of the chart.
 	if (d3.event != null) {
 	    translate = d3.event.translate
-        } else {
+	} else {
 	    translate = [0,0]
 	}
 	// Check to see if the pan is legal (doesn't try to pan
@@ -194,7 +194,7 @@ function plot(data, varname, tag) {
 		.attr("dx", "-.8em")
 		.attr("dy", ".15em")
 		.attr("transform", function(d) {
-                    return "rotate(-90)";
+		    return "rotate(-90)";
 		});
 
 	    // Update the Y axis (probably not necessary if we don't rescale the Y axis)
@@ -227,6 +227,8 @@ function plot(data, varname, tag) {
     draw();
 }
 
+
+
 $.ajaxSetup ({
     // Disable caching of AJAX responses
     // Used when debugging
@@ -237,17 +239,20 @@ $.ajaxSetup ({
 var list = [ 'outside_temp', 'pressure', 'rssi', 'wind_direction', 'recv_packets', 'rain_spoons', 'heatindex', 'inside_humidity', 'inside_temp', 'outside_humidity', 'rain', 'solar_wm2', 'uv_index', 'wind_gust', 'wind_gust_direction', 'wind_speed' ]
 
 // Date range to chart
-var startDate = new Date("2014-10-17");
-var endDate = new Date("2014-12-17");
+var startDate = new Date("2014-10-17"); // Fixed start
+var endDate = new Date("2014-12-17"); // Fixed end
+// endDate = new Date();  // Ending now
+// var startDate = new Date();
+// startDate.setDate(endDate.getDate()-1); // starting one day before end
 var date = startDate;
 
 function pad(n){return n<10 ? '0'+n : n}
 
 // List all the dates.  It might be possible to merge this code with
 // the next for loop.
-var dates = [];
-while(date < endDate) {
-    var s = date.getFullYear() + "-" + pad(date.getMonth()+1) + "-" + pad(date.getDate());
+// var dates = [];
+while(date <= endDate) {
+    var s = date.getFullYear() + "-" + pad(date.getMonth()+1) + "-" + pad(date.getDate()) + ".json";
     dates.push(s);
     date.setDate(date.getDate() + 1);
 }
@@ -256,7 +261,7 @@ while(date < endDate) {
 var ajax_list = []
 for (var i = 0; i < dates.length; i++) {
     var n = dates[i];
-    var v = $.ajax("data/" + n + ".json");
+    var v = $.ajax(n);
     ajax_list.push(v);
 }
 
@@ -308,3 +313,4 @@ $.when.apply($, ajax_list)
     .fail(function(e) {
 	console.log("Err..." + e);
     });
+
